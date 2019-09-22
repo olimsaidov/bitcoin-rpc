@@ -1,4 +1,4 @@
-(defproject bitcoin-rpc "0.2.0-SNAPSHOT"
+(defproject bitcoin-rpc "0.2.0"
   :description "Clojure Bitcoin RPC client"
   :url "https://github.com/olimsaidov/bitcoin-rpc"
 
