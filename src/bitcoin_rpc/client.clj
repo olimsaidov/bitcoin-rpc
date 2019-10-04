@@ -14,13 +14,22 @@
   (perform [_ method params]
     (let [response
           (client/request
-            {:url          url
-             :as           :json
-             :method       :post
-             :content-type :json
-             :basic-auth   (when (and user pass) [user pass])
-             :form-params  {:jsonrpc "1" :method method :params params}})]
+            {:url              url
+             :method           :post
+             :basic-auth       (when (and user pass) [user pass])
+             :form-params      {:jsonrpc "1" :method method :params params}
+             :content-type     :json
+             :throw-exceptions false})
 
-      (if (empty? (:error (:body response)))
-        (:result (:body response))
-        (throw (ex-info "Perform failed" (::error (:body response))))))))
+          body (try (parse-string (:body response) true)
+                    (catch Throwable _ nil))]
+
+      (cond
+        (empty? (:error body))
+        (:result body)
+
+        (some? (:error body))
+        (throw (ex-info (:message (:error body)) {:code (:code (:error body))}))
+
+        :else
+        (throw (ex-info (str "clj-http: status " (:status response)) response))))))
