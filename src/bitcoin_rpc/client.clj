@@ -25,11 +25,11 @@
                     (catch Throwable _ nil))]
 
       (cond
-        (empty? (:error body))
-        (:result body)
-
         (some? (:error body))
         (throw (ex-info (:message (:error body)) {:code (:code (:error body))}))
+
+        (some? (:result body))
+        (:result body)
 
         :else
         (throw (ex-info (str "clj-http: status " (:status response)) response))))))
