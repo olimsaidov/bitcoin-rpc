@@ -1,5 +1,6 @@
 (ns bitcoin-rpc.client
   (:require [clj-http.client :as client]
+            [cheshire.parse :refer [*use-bigdecimals?*]]
             [cheshire.core :refer [parse-string]]))
 
 
@@ -21,8 +22,10 @@
              :content-type     :json
              :throw-exceptions false})
 
-          body (try (parse-string (:body response) true)
-                    (catch Throwable _ nil))]
+          body
+          (try (binding [*use-bigdecimals?* true]
+                 (parse-string (:body response) true))
+               (catch Throwable _ nil))]
 
       (cond
         (some? (:error body))
